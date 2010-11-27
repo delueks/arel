@@ -179,14 +179,6 @@ module Arel
         "#{visit o.left} #{visit o.right}"
       end
 
-      def visit_Arel_Nodes_OuterJoin o
-        "#{visit o.left} LEFT OUTER JOIN #{visit o.right} #{visit o.constraint}"
-      end
-
-      def visit_Arel_Nodes_InnerJoin o
-        "#{visit o.left} INNER JOIN #{visit o.right} #{visit o.constraint if o.constraint}"
-      end
-
       def visit_Arel_Nodes_On o
         "ON #{visit o.expr}"
       end
