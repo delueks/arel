@@ -1,9 +1,5 @@
 module Arel
   module Predications
-    def as other
-      Nodes::As.new self, other
-    end
-
     def not_eq other
       Nodes::NotEqual.new self, other
     end
