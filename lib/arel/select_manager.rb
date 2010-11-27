@@ -2,11 +2,25 @@ module Arel
   class SelectManager < Arel::TreeManager
     include Arel::Crud
 
+    attr_reader :ctx
+
     def initialize engine, table = nil
       super(engine)
       @ast   = Nodes::SelectStatement.new
       @ctx    = @ast.cores.last
       from table
+    end
+
+    def [] attribute_name
+      @ctx.projections.select{|p| (p.alias || p.name) == attribute_name}.first
+    end
+
+    def name
+      @ctx.froms.name
+    end
+
+    def table_alias
+      @ctx.froms.table_alias
     end
 
     def taken
@@ -82,6 +96,13 @@ module Arel
     def join relation, klass = Nodes::InnerJoin
       return self unless relation
 
+      if relation.respond_to?(:subquery?) && !relation.subquery?
+        @ctx.projections += relation.ctx.projections
+        @ctx.wheres += relation.ctx.wheres
+        @ctx.groups += relation.ctx.groups
+        relation = relation.ctx.froms
+      end
+
       case relation
       when String, Nodes::SqlLiteral
         raise if relation.blank?
@@ -89,6 +110,12 @@ module Arel
       else
         from klass.new(@ctx.froms, relation, nil)
       end
+    end
+
+    def subquery?
+      @ctx.projections.any?{|p| 
+        Arel::Nodes::Function.subclasses.include?(p.class)
+      }
     end
 
     def having expr

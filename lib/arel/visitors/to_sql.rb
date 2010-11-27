@@ -191,8 +191,36 @@ module Arel
         "ON #{visit o.expr}"
       end
 
-      def visit_Arel_Nodes_Not o
-        "NOT #{visit o.expr}"
+      def visit_Arel_SelectManager o
+        "(#{o.to_sql}) #{o.froms.name}"
+      end
+
+      def visit_nested_join o, old_ons
+        send "visit_nested_join_#{o.class.name.gsub('::', '_')}", o, old_ons
+      end
+
+      def visit_nested_join_Arel_Nodes_OuterJoin o, old_ons
+        "#{visit o.left} #{visit old_ons if old_ons} LEFT OUTER JOIN #{visit o.right} #{visit o.constraint if o.constraint}"
+      end
+
+      def visit_nested_join_Arel_Nodes_InnerJoin o, old_ons
+        "#{visit o.left} #{visit old_ons if old_ons} INNER JOIN #{visit o.right} #{visit o.constraint if o.constraint}"
+      end
+
+      def visit_Arel_Nodes_OuterJoin o
+        if o.right.is_a?(Arel::Nodes::Join)# && ! o.left.is_a?(Arel::Nodes::Join)
+          "#{visit o.left} LEFT OUTER JOIN #{visit_nested_join(o.right, o.constraint)}"
+        else
+          "#{visit o.left} LEFT OUTER JOIN #{visit o.right} #{visit o.constraint if o.constraint}"
+        end
+      end
+
+      def visit_Arel_Nodes_InnerJoin o
+        if o.right.is_a?(Arel::Nodes::Join)# && ! o.left.is_a?(Arel::Nodes::Join)
+          "#{visit o.left} INNER JOIN #{visit_nested_join(o.right, o.constraint)}"
+        else
+          "#{visit o.left} INNER JOIN #{visit o.right} #{visit(o.constraint) if o.constraint}"
+        end
       end
 
       def visit_Arel_Table o
@@ -201,6 +229,10 @@ module Arel
         else
           quote_table_name o.name
         end
+      end
+
+      def visit_Arel_Nodes_Not o
+        "NOT #{visit o.expr}"
       end
 
       def visit_Arel_Nodes_In o

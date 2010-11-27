@@ -48,16 +48,12 @@ module Arel
       nil
     end
 
-    def join relation, klass = Nodes::InnerJoin
-      return from(self) unless relation
+    def merge *args
+      from(self).merge *args
+    end
 
-      case relation
-      when String, Nodes::SqlLiteral
-        raise if relation.blank?
-        from Nodes::StringJoin.new(self, relation)
-      else
-        from klass.new(self, relation, nil)
-      end
+    def join *args
+      from(self).join *args
     end
 
     def group *columns
