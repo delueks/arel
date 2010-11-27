@@ -4,8 +4,8 @@ module Arel
 
       attr_accessor :distinct
 
-      def initialize expr, distinct = false, aliaz = nil
-        super(expr, aliaz)
+      def initialize expr, distinct = false
+        super expr
         @distinct = distinct
       end
     end

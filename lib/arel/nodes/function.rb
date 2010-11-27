@@ -2,16 +2,18 @@ module Arel
   module Nodes
     class Function < Arel::Nodes::Node
       include Arel::Expression
-      attr_accessor :expressions, :alias
+      attr_accessor :expression
 
-      def initialize expr, aliaz = nil
-        @expressions = expr
-        @alias       = aliaz
+      def initialize expr
+          @expression = expr
       end
 
       def as aliaz
-        self.alias = SqlLiteral.new(aliaz)
-        self
+        Arel::Nodes::As.new(self, aliaz)
+      end
+
+      def name
+        @expression.name
       end
     end
   end

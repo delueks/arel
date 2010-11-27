@@ -12,7 +12,7 @@ module Arel
     end
 
     def [] attribute_name
-      @ctx.projections.select{|p| (p.alias || p.name) == attribute_name}.first
+      @ctx.projections.select{|p| p.name == attribute_name}.first
     end
 
     def name

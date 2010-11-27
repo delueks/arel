@@ -118,29 +118,23 @@ module Arel
       end
 
       def visit_Arel_Nodes_Count o
-        "COUNT(#{o.distinct ? 'DISTINCT ' : ''}#{o.expressions.map { |x|
-          visit x
-        }.join(', ')})#{o.alias ? " AS #{visit o.alias}" : ''}"
+        "COUNT(#{o.distinct ? 'DISTINCT ' : ''}#{visit o.expression})"
       end
 
       def visit_Arel_Nodes_Sum o
-        "SUM(#{o.expressions.map { |x|
-          visit x }.join(', ')})#{o.alias ? " AS #{visit o.alias}" : ''}"
+        "SUM(#{visit o.expression})"
       end
 
       def visit_Arel_Nodes_Max o
-        "MAX(#{o.expressions.map { |x|
-          visit x }.join(', ')})#{o.alias ? " AS #{visit o.alias}" : ''}"
+        "MAX(#{visit o.expression})"
       end
 
       def visit_Arel_Nodes_Min o
-        "MIN(#{o.expressions.map { |x|
-          visit x }.join(', ')})#{o.alias ? " AS #{visit o.alias}" : ''}"
+        "MIN(#{visit o.expression})"
       end
 
       def visit_Arel_Nodes_Avg o
-        "AVG(#{o.expressions.map { |x|
-          visit x }.join(', ')})#{o.alias ? " AS #{visit o.alias}" : ''}"
+        "AVG(#{visit o.expression})"
       end
 
       def visit_Arel_Nodes_TableAlias o
@@ -275,7 +269,7 @@ module Arel
       end
 
       def visit_Arel_Nodes_As o
-        "#{visit o.left} AS #{visit o.right}"
+        "#{visit o.left} AS #{visit Arel::SqlLiteral.new(o.right)}"
       end
 
       def visit_Arel_Nodes_UnqualifiedColumn o
