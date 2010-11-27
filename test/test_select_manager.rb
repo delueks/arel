@@ -266,7 +266,7 @@ module Arel
       end
     end
 
-    describe 'join' do
+    describe 'simple join' do
       it 'responds to join' do
         left      = Table.new :users
         right     = left.alias
