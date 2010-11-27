@@ -297,6 +297,34 @@ module Arel
         }
       end
 
+      it 'merges a select_manager if no nested query is needed' do
+        table     = Table.new :users
+        left      = Arel::SelectManager.new Table.engine, table
+        right     = Arel::SelectManager.new Table.engine, table.alias
+        predicate = left[:id].eq(right[:id])
+        left_manager.join(right_manager).on(predicate)
+        left_manager.to_sql.must_be_like %{
+           SELECT FROM "users"
+             INNER JOIN "users" "users_2"
+               ON "users"."id" = "users_2"."id"
+        }
+      end
+
+      it 'nests a select_manager with aggregations' do
+        table      = Table.new :users
+        left       = Arel::SelectManager.new Table.engine, table
+        right      = Arel::SelectManager.new Table.engine, table.alias
+        right.project(right[:id].minimum.as("aggregate")).group(right[:id])
+        predicate  = left[:id].eq(right[:id])
+        left.join(right).on(predicate)
+        left.to_sql.must_be_like %{
+           SELECT FROM "users"
+             INNER JOIN (#{right.to_sql})
+             ON "users"."id" = "users_2"."id"
+        }
+      end
+
+
       it 'noops on nil' do
         manager   = Arel::SelectManager.new Table.engine
         manager.join(nil).must_equal manager
