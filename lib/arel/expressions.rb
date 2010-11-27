@@ -1,5 +1,5 @@
 module Arel
-  module Expressions
+  module Aggregations
     def count distinct = false
       Nodes::Count.new(self, distinct)
     end
