@@ -34,7 +34,7 @@ module Arel
       end
     end
 
-    def alias aliaz = "#{@name}_#{(@aliases.size+1).to_s}"
+    def alias aliaz = "#{@name}_#{(@aliases.size+2).to_s}"
       Nodes::TableAlias.new(aliaz, self).tap do |node|
         @aliases << node
       end
