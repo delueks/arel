@@ -40,8 +40,6 @@ module Arel
       self
     end
 
-    ###
-    # Produces an Arel::Nodes::Exists node
     def exists
       Arel::Nodes::Exists.new @ast
     end
