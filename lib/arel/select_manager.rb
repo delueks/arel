@@ -31,6 +31,10 @@ module Arel
       @ctx.wheres
     end
 
+    def froms
+      @ctx.froms
+    end
+
     def skip amount
       @ast.offset = Nodes::Offset.new(amount)
       self
